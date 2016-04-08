@@ -2,7 +2,7 @@ from __future__ import division
 from collections import Counter, defaultdict
 from functools import partial
 import math, random
-import csv 
+import csv
 
 def entropy(class_probabilities):
     """given a list of class probabilities, compute the entropy"""
@@ -93,7 +93,7 @@ def build_tree_id3(inputs, split_candidates=None):
     
     # recursively build the subtrees
     subtrees = { attribute : build_tree_id3(subset, new_candidates)
-                 for attribute, subset in partitions.iteritems() }
+                 for attribute, subset in partitions.items() }
 
     subtrees[None] = num_trues > num_falses # default case
 
@@ -105,16 +105,50 @@ def forest_classify(trees, input):
     return vote_counts.most_common(1)[0][0]
 
 
-with open('house-votes-84.data.txt') as file:
-    reader = csv.reader(file, delimiter=',')
-    next(reader)
-    rows = [r for r in reader]
-print(rows)
+with open('house-votes-84.data.txt') as f:
+    reader = csv.reader(f)
+    raw_data = [r for r in reader]
+
+features = ['handicapped-infants',
+            'water-project-cost-sharing',
+            'adoption-of-the-budget-resolution',
+            'physician-fee-freeze',
+            'el-salvador-aid',
+            'religious-groups-in-schools',
+            'anti-satellite-test-ban',
+            'aid-to-nicaraguan-contras',
+            'mx-missile',
+            'immigration',
+            'synfuels-corporation-cutback',
+            'education-spending',
+            'superfund-right-to-sue',
+            'crime',
+            'duty-free-exports',
+            'export-administration-act-south-africa'
+            ]
+
+data = []
+
+for datum in raw_data:
+    data.append((dict(zip(features, datum[1:])), datum[0] == 'democrat'))
 
 
+from decision_trees import build_tree_id3
+tree = build_tree_id3(data)
 
-    # for key in ['level','lang','tweets','phd']:
-    #     print key, partition_entropy_by(inputs, key)
-    # print
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+pp.pprint(tree)
 
-  
+if (classify(tree, {'physician-fee-freeze' : 'n',
+                      'adoption-of-the-budget-resolution' : 'y',
+                      'export-administration-act-south-africa': 'y'
+                    })) :
+    print("The congressperson is likely to be a democrat")
+else:
+    print("The congressperson is likely to be a republican")
+
+# print("The congressperson is likely to be a" + )
+print("The first feature to split on is: " + tree[0])
+
+
