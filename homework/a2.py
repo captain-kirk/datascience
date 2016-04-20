@@ -40,7 +40,7 @@ def guns():
     with open('guns.csv', 'r', encoding='utf-8') as f:
         reader = csv.DictReader(f, delimiter=',')
         rows = [r for r in reader if r['Average firearms per 100 people'] != '']
-        
+    
     decreasing = sorted(rows, key=rate, reverse=True)
     decreasing = decreasing[:20]
         
