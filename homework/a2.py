@@ -43,9 +43,12 @@ def guns():
     
     decreasing = sorted(rows, key=rate, reverse=True)
     decreasing = decreasing[:20]
+    
         
     countries = [country['ISO code'] for country in decreasing]
     rates = [row['Average firearms per 100 people'] for row in decreasing]
+
+    print(countries)
 
     i=0;
     
